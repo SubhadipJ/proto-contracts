@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package greengrub.proto.donation;
+
+option java_multiple_files = true;
+option java_package = "com.greengrub.proto.donation";
+option java_outer_classname = "DonationServiceProto";
+
+// ============================================================
+//  DONATION SERVICE
+// ============================================================
+
+service DonationService {
+  rpc CreateDonation        (CreateDonationRequest)      returns (DonationResponse);
+  rpc GetAllDonations       (DonationListRequest)                      returns (DonationListResponse);
+  rpc GetDonationById       (DonationByIdRequest)        returns (DonationResponse);
+  rpc GetDonationsByUserId  (DonationByUserIdRequest)    returns (DonationListResponse);
+  rpc UpdateDonation        (UpdateDonationRequest)      returns (DonationResponse);
+  rpc DeleteDonation        (DonationByIdRequest)        returns (DeleteDonationResponse);
+  rpc GetFoodItemsByDonationId (FoodListRequest)         returns (FoodListResponse);
+  rpc GetUsersByDonationId (DonationByIdRequest) returns (ListUsersResponse);  //List
+}
+
+// ============================================================
+//  ENUMS
+// ============================================================
+
+enum DonationStatus {
+  ACTIVE    = 0;
+  CLAIMED   = 1;
+  CANCELLED = 2;
+}
+
+enum Unit {
+  UNIT_UNSPECIFIED = 0;
+  KG       = 1;
+  SERVINGS = 2;
+}
+
+// ============================================================
+//  SHARED MESSAGES
+// ============================================================
+
+message Empty {
+}
+
+message UserDetail {
+  string user_id    = 1;
+  string first_name = 2;
+  string last_name  = 3;
+  string email      = 4;
+  string phone      = 5;
+}
+
+message Quantity {
+  double amount = 1;
+  Unit   unit   = 2;
+}
+
+message Food {
+  string food_id = 1;                    // UUID
+  string food_name = 2;
+  Quantity quantity = 3;
+  string status = 4;                // e.g. PENDING, APPROVED, DONATED, EXPIRED
+  string created_at = 5;
+}
+
+// ============================================================
+//  REQUEST MESSAGES
+// ============================================================
+
+message DonationListRequest {
+  string orderBy = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message CreateDonationRequest {
+  string         donation_name      = 1;
+  UserDetail     doner_details      = 2;
+  string         pick_up_address    = 3;
+  string         pick_up_time       = 4;
+  Quantity       estimated_quantity = 5;
+  repeated string food_items_id     = 6;
+  DonationStatus status             = 7;
+}
+
+message DonationByIdRequest {
+  string id = 1;
+}
+
+message DonationByUserIdRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 page_seize = 3;
+}
+
+message  FoodListRequest {
+  repeated string food_item_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message UpdateDonationRequest {
+  string         id                 = 1;
+  string         donation_name      = 2;
+  UserDetail     doner_details      = 3;
+  string         pick_up_address    = 4;
+  string         pick_up_time       = 5;
+  Quantity       estimated_quantity = 6;
+  repeated string food_items_id     = 7;
+  DonationStatus status             = 8;
+}
+
+// ============================================================
+//  RESPONSE MESSAGES
+// ============================================================
+
+message DonationResponse {
+  string         id                 = 1;
+  string         donation_name      = 2;
+  UserDetail     doner_details      = 3;
+  string         pick_up_address    = 4;
+  string         pick_up_time       = 5;
+  Quantity       estimated_quantity = 6;
+  repeated string food_items_id     = 7;
+  DonationStatus status             = 8;
+  string         creation_date      = 9;
+  string         update_date        = 10;
+}
+
+message DonationListResponse {
+  repeated DonationResponse donations = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+
+}
+
+message FoodListResponse {
+  repeated Food foods = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message DeleteDonationResponse {
+  string message = 1;
+}
+
+message ListUsersResponse {
+  repeated UserDetail users = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}

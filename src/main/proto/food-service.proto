@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package com.greengrub.proto.foods;
+
+option java_multiple_files = true;
+option java_package = "com.greengrub.proto.foods";
+option java_outer_classname = "FoodServiceProto";
+
+// ========================================
+// ENUMS
+// ========================================
+enum Unit {
+  UNIT_UNSPECIFIED = 0;
+  KG = 1;
+  SERVINGS = 2;
+}
+
+// ========================================
+// MESSAGES
+// ========================================
+
+message Quantity {
+  double amount = 1;
+  Unit unit = 2;
+}
+
+message Image {
+  string id = 1;           // UUID as string
+  string creator_id = 2;   // UUID as string
+  string url = 3;          // GCP Storage URL
+}
+
+message Food {
+  string id = 1;                    // UUID
+  string food_name = 2;
+  Quantity quantity = 3;
+  string requested_by = 4;          // User ID
+  string requested_date = 5;        // ISO datetime string
+  string used_by_date = 6;          // Expiry / Use by date
+  repeated Image images = 7;        // Attached images
+  string status = 8;                // e.g. PENDING, APPROVED, DONATED, EXPIRED
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+// ========================================
+// REQUEST MESSAGES
+// ========================================
+
+message CreateFoodRequest {
+  string food_name = 1;
+  Quantity quantity = 2;
+  string requested_by = 3;           // User ID
+  string used_by_date = 4;           // ISO datetime
+  repeated bytes image_data = 5;     // Raw image bytes (optional)
+}
+
+message UpdateFoodStatusRequest {
+  string food_id = 1;
+  string status = 2;                 // PENDING, APPROVED, DONATED, EXPIRED
+}
+
+message GetFoodRequest {
+  string food_id = 1;
+}
+
+message GetFoodsByUserRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+// ============================================================
+//  RESPONSE MESSAGES
+// ============================================================
+
+message CreateFoodResponse {
+  Food food = 1;
+  string message = 2;
+}
+
+message UpdateFoodStatusResponse {
+  Food food = 1;
+  string message = 2;
+}
+
+message GetFoodResponse {
+  Food food = 1;
+}
+
+message GetFoodsByUserResponse {
+  repeated Food foods = 1;
+  int32 total_count = 2;
+}
+
+// ========================================
+// SERVICE DEFINITION
+// ========================================
+service FoodService {
+  rpc CreateFood(CreateFoodRequest) returns (CreateFoodResponse);  // Create new food request
+  rpc GetFood(GetFoodRequest) returns (GetFoodResponse);  // Get single food by ID
+  rpc GetFoodsByUser(GetFoodsByUserRequest) returns (GetFoodsByUserResponse);   // Get all foods posted by a user
+  rpc UpdateFoodStatus(UpdateFoodStatusRequest) returns (UpdateFoodStatusResponse);  // Get all foods posted by a user
+  // Future possible methods
+  // rpc DeleteFood(DeleteFoodRequest) returns (DeleteFoodResponse);
+  // rpc SearchFoods(SearchFoodsRequest) returns (SearchFoodsResponse);
+}
