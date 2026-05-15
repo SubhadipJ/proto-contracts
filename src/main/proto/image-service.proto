@@ -38,22 +38,16 @@ message UploadImagesRequest {
   string creator_id = 1;                    // Common creator for all images in this batch
   CreatorType creator_type = 2;
   repeated bytes image_data = 3;            // List of raw image bytes (one per image)
+  string file_name = 4;
+  string content_type = 5;
 }
 
 message GetImagesByCreatorRequest {
   string creator_id = 1;                    // This is the shared customerId / foodRequestId
 }
 
-message DeleteImageByImageIdRequest {
+message ImageByImageIdRequest {
   string image_id = 1;
-}
-
-message UploadLocalImageRequest {
-  string file_name = 1;
-  string content_type = 2;
-  repeated bytes image_data = 3;
-  string creator_id = 4;                    // Common creator for all images in this batch
-  CreatorType creator_type = 5;
 }
 
 // ============================================================
@@ -73,26 +67,13 @@ message GetImagesByCreatorResponse {
   repeated Image images = 1;                // List of raw image
 }
 
-message UploadLocalImageResponse {
-  repeated string message = 1;
-  string total_image_count = 2;
-}
-
-message GetLocalImagesByCreatorResponse {
-  repeated Image images = 1;                // List of raw image
-}
-
 // ========================================
 // SERVICE DEFINITION
 // ========================================
 service ImageService {
   rpc UploadImages(UploadImagesRequest) returns (UploadImagesResponse);  // Batch upload multiple photos at once
   rpc GetImagesByCreator(GetImagesByCreatorRequest) returns (stream GetImagesByCreatorResponse);  // Get all photos for a given creator (customerId)
-  rpc DeleteImagesByImageId(DeleteImageByImageIdRequest) returns (DeleteImageByImageIdResponse); // Delete Image by Image Id
-  rpc GetImageByImageId(DeleteImageByImageIdRequest) returns (stream GetImagesByCreatorResponse); // Get Image By ImageId
+  rpc DeleteImagesByImageId(ImageByImageIdRequest) returns (DeleteImageByImageIdResponse); // Delete Image by Image Id
+  rpc GetImageByImageId(ImageByImageIdRequest) returns (stream GetImagesByCreatorResponse); // Get Image By ImageId
 
-  //For Local Storage
-  rpc UploadLocalImages(UploadLocalImageRequest) returns(UploadLocalImageResponse);
-  rpc GetLocalImagesByCreator(GetImagesByCreatorRequest) returns (stream GetLocalImagesByCreatorResponse);
-  rpc GetLocalImageByImageId(DeleteImageByImageIdRequest) returns (stream GetLocalImagesByCreatorResponse);
 }
