@@ -92,7 +92,7 @@ message DonationByIdRequest {
 message DonationByUserIdRequest {
   string user_id = 1;
   int32 page = 2;
-  int32 page_seize = 3;
+  int32 page_size = 3;
 }
 
 message  FoodListRequest {
